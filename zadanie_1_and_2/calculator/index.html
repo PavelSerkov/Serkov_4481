@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator {
+            background-color: #2d2d2d;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        #result {
+            width: 100%;
+            height: 60px;
+            font-size: 28px;
+            text-align: right;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 20px 0;
+            font-size: 20px;
+            border: none;
+            border-radius: 12px;
+            background-color: #e0e0e0;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #d0d0d0;
+        }
+
+        .operator {
+            background-color: #ffb74d;
+            color: #1a1a1a;
+        }
+
+        .operator:hover {
+            background-color: #ffab40;
+        }
+
+        .equals {
+            background-color: #4caf50;
+            color: #ffffff;
+        }
+
+        .equals:hover {
+            background-color: #45a049;
+        }
+
+        .clear {
+            background-color: #ef5350;
+            color: #ffffff;
+        }
+
+        .clear:hover {
+            background-color: #e53935;
+        }
+
+        .span-two {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Калькулятор</h1>
+        
+        <input type="text" id="result" readonly>
+        
+        <div class="buttons-grid">
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operator">/</button>
+            
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operator">*</button>
+            
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operator">-</button>
+            
+            <button>0</button>
+            <button>.</button>
+            <button class="clear">C</button>
+            <button class="operator">+</button>
+            
+            <button class="equals span-two">=</button>
+        </div>
+    </div>
+
+    <script>
+        const resultInput = document.getElementById('result');
+        const buttonsContainer = document.querySelector('.buttons-grid');
+
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let resetScreen = false;
+
+        function updateDisplay() {
+            resultInput.value = currentInput;
+        }
+
+        function inputDigit(digit) {
+            if (resetScreen) {
+                currentInput = digit;
+                resetScreen = false;
+            } else {
+                if (currentInput === '0') {
+                    currentInput = digit;
+                } else {
+                    currentInput += digit;
+                }
+            }
+        }
+
+        function inputDecimal() {
+            if (resetScreen) {
+                currentInput = '0.';
+                resetScreen = false;
+                return;
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+        }
+
+        function chooseOperation(op) {
+            if (operator !== null && !resetScreen) {
+                compute();
+            }
+            previousInput = currentInput;
+            operator = op;
+            resetScreen = true;
+        }
+
+        function compute() {
+            let result;
+            const prev = parseFloat(previousInput);
+            const curr = parseFloat(currentInput);
+            if (isNaN(prev) || isNaN(curr)) return;
+
+            switch (operator) {
+                case '+':
+                    result = prev + curr;
+                    break;
+                case '-':
+                    result = prev - curr;
+                    break;
+                case '*':
+                    result = prev * curr;
+                    break;
+                case '/':
+                    // Проверка деления на ноль: выводим "Ошибка" и сбрасываем состояние
+                    if (curr === 0) {
+                        currentInput = 'Ошибка';
+                        operator = null;
+                        previousInput = '';
+                        resetScreen = true;
+                        updateDisplay();
+                        return;
+                    }
+                    result = prev / curr;
+                    break;
+                default:
+                    return;
+            }
+
+            currentInput = result.toString();
+            operator = null;
+            previousInput = '';
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            resetScreen = false;
+            updateDisplay();
+        }
+
+        buttonsContainer.addEventListener('click', (e) => {
+            const button = e.target;
+            if (button.tagName !== 'BUTTON') return;
+
+            const text = button.textContent.trim();
+
+            if (text >= '0' && text <= '9') {
+                inputDigit(text);
+            } else if (text === '.') {
+                inputDecimal();
+            } else if (['+', '-', '*', '/'].includes(text)) {
+                chooseOperation(text);
+            } else if (text === '=') {
+                compute();
+            } else if (text === 'C' || text === 'clear') {
+                clearAll();
+            }
+
+            updateDisplay();
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>

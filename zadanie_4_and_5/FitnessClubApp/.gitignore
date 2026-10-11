@@ -1,0 +1,25 @@
+# Зависимости
+node_modules/
+
+# Сборка
+dist/
+build/
+
+# Кеш и временные файлы
+.vite/
+.cache/
+*.log
+npm-debug.log*
+
+# Файлы IDE
+.vscode/
+.idea/
+*.swp
+
+# ОС
+.DS_Store
+Thumbs.db
+
+# Переменные окружения
+.env
+.env.local
